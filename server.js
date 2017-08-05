@@ -8,6 +8,8 @@ var app = express();
 // Specify the port.
 var port = process.env.PORT || 3000;
 
+var db = require("./models");
+
 // Set Handlebars as the default templating engine.
 app.engine("handlebars", exphbs({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
@@ -18,6 +20,11 @@ app.use(bodyParser.text());
 app.use(bodyParser.json({ type: "application/vnd.api+json" }));	
 app.use(methodOverride("_method"));
 
-const routes = require("./controllers/burgers_controller.js")
-app.use("/", routes)
-app.listen(port)
+
+require("./routes/routes.js")(app);
+
+db.sequelize.sync({ force: true }).then(function() {
+  app.listen(port, function() {
+    console.log("App listening on port " + port);
+  });
+});
